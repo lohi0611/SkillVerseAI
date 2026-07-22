@@ -1,19 +1,23 @@
 package com.skillverse.backend.service;
 
+import com.skillverse.backend.dto.LoginRequest;
 import com.skillverse.backend.dto.RegisterRequest;
 import com.skillverse.backend.entity.User;
 import com.skillverse.backend.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import java.util.Objects;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    // Constructor Injection
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
+
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public String register(RegisterRequest request) {
@@ -25,13 +29,26 @@ public class UserService {
         User user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
-                .password(request.getPassword())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .build();
 
-        // ensure user is non-null to satisfy null-safety contracts
-        Objects.requireNonNull(user, "user must not be null");
         userRepository.save(user);
 
         return "User Registered Successfully";
     }
+    public String login(LoginRequest request) {
+
+    User user = userRepository.findByEmail(request.getEmail())
+            .orElse(null);
+
+    if (user == null) {
+        return "User not found";
+    }
+
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        return "Invalid password";
+    }
+
+    return "Login Successful";
+}
 }
