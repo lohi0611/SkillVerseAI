@@ -1,5 +1,6 @@
 package com.skillverse.backend.controller;
 
+import com.skillverse.backend.dto.AuthResponse;
 import com.skillverse.backend.dto.LoginRequest;
 import com.skillverse.backend.dto.RegisterRequest;
 import com.skillverse.backend.service.UserService;
@@ -20,9 +21,9 @@ public class AuthController {
     public String register(@RequestBody RegisterRequest request) {
         return userService.register(request);
     }
-    
+
     @PostMapping("/login")
-public String login(@RequestBody LoginRequest request) {
+public AuthResponse login(@RequestBody LoginRequest request) {
     return userService.login(request);
 }
 }

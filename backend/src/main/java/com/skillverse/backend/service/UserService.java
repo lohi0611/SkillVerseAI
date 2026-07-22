@@ -1,5 +1,7 @@
 package com.skillverse.backend.service;
 
+import com.skillverse.backend.dto.AuthResponse;
+import com.skillverse.backend.security.JwtService;
 import com.skillverse.backend.dto.LoginRequest;
 import com.skillverse.backend.dto.RegisterRequest;
 import com.skillverse.backend.entity.User;
@@ -12,13 +14,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+                   PasswordEncoder passwordEncoder,
+                   JwtService jwtService) {
 
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+    this.jwtService = jwtService;
+}
 
     public String register(RegisterRequest request) {
 
@@ -36,19 +41,33 @@ public class UserService {
 
         return "User Registered Successfully";
     }
-    public String login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
 
     User user = userRepository.findByEmail(request.getEmail())
             .orElse(null);
 
     if (user == null) {
-        return "User not found";
+        return new AuthResponse(
+                "User not found",
+                null
+        );
     }
 
-    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-        return "Invalid password";
+    if (!passwordEncoder.matches(
+            request.getPassword(),
+            user.getPassword())) {
+
+        return new AuthResponse(
+                "Invalid password",
+                null
+        );
     }
 
-    return "Login Successful";
+    String token = jwtService.generateToken(user.getEmail());
+
+    return new AuthResponse(
+            "Login Successful",
+            token
+    );
 }
 }
