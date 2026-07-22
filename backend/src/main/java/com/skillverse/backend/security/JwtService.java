@@ -1,7 +1,8 @@
 package com.skillverse.backend.security;
 
+
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 
@@ -27,4 +28,34 @@ public class JwtService {
                 .signWith(key)
                 .compact();
     }
+
+public String extractEmail(String token) {
+
+    Claims claims = Jwts.parser()
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload();
+
+    return claims.getSubject();
+}
+
+public boolean isTokenValid(String token) {
+
+    try {
+
+        Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token);
+
+        return true;
+
+    } catch (Exception e) {
+
+        return false;
+
+    }
+
+}
 }
