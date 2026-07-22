@@ -1,0 +1,24 @@
+# Node
+node_modules/
+frontend/node_modules/
+
+# React
+dist/
+frontend/dist/
+
+# Java
+backend/target/
+
+# VS Code
+.vscode/
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
